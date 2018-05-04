@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <!-- Bootstrap -->
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+    <title>Great Number Game</title>
+    <style>
+        .lose {
+            color: red;
+        }
+
+        .earn {
+            color: green;
+        }
+
+        form {
+            margin: 10px;
+            padding: 10px;
+        }
+
+        ul {
+            max-height: 300px;
+            overflow: auto;
+        }
+
+        li {
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <main role="main">
+     
+    <section class="jumbotron text-center">
+        <div class="container">
+            <h1 class="jumbotron-heading">Ninja Gold Game</h1>
+        </div>
+    </section>
+
+    <div class="container text-center">
+        {% if session["totalGold"] >= 0: %}
+        <h2>Your Gold: {{ session["totalGold"] }}</h2>
+        {% else: %}
+        <h2>Your Gold: {{ session["totalGold"] }}<br><span class="lose">You're broke you idiot! perform the Seppuku!</span></h2>
+        {% endif %}
+        <br>
+        <div class="row">
+            <div class="col-6">
+                <div class="row">
+                    {% for plObj in playObject: %}
+                    <form class="card col-5" action="/process_money" method="post">
+                        <input type="hidden" name="actPlace" value="{{ plObj["name"] }}">
+                        <br>
+                        <h4>{{ plObj["name"] }}</h4>
+                        {% if plObj["justEarn"] == True: %}
+                        {% set msg = "( earns {}-{} golds )".format(plObj["lowRng"], plObj["highRng"]) %}
+                        {% else: %}
+                        {% set msg = "( earns/takes {}-{} golds )".format(plObj["lowRng"], plObj["highRng"]) %}
+                        {% endif %}
+                        <p>{{ msg }}</p>
+                        <button class="btn btn-primary btn-block" type="submit">Find Gold!</button>
+                    </form>
+                    <br>
+                    {% endfor %}
+                </div>
+            </div>
+            <dov class="col-1"></dov>
+            <div class="col-5">
+                <div class="row">
+                    <h3 class="col-3">Activities</h3>
+                    <div class="col-6"></div>
+                    <button type="button" class="col-3 btn btn-primary btn-block" onclick="window.location.href='/reset'">New Game</button>                    
+                </div>
+                <br>
+                <div class="row">
+                    <ul class="list-group">
+                        {% for i in range(session["ninjaActs"]|length - 1, 0, -1): %}
+                            {% set actObj = session["ninjaActs"][i] %}
+                            {% if actObj["mode"] == 0: %}
+                                <li class="list-group-item lose">{{ i }} - {{ actObj["action"] }}</li>
+                            {% else: %}
+                                <li class="list-group-item earn">{{ i }} - {{ actObj["action"] }}</li>
+                            {% endif %}
+                        {% endfor %}
+                    </ul>            
+                </div>
+            </div>
+        </div>
+    </div>
+
+    
+    <script type="text/javascript" src="{{ url_for('static', filename='js/jquery-3.3.1.slim.min.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/popper.min.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+</body>
+</html>
